@@ -38,9 +38,10 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Chat Header */}
-      <div className="p-4 bg-white/10 backdrop-blur-lg border-b border-white/20 shadow-lg">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+      
+      {/* Chat Header - Now Sticky */}
+      <div className="sticky top-0 z-10 p-4 bg-white/10 backdrop-blur-lg border-b border-white/20 shadow-lg">
         <div className="flex items-center gap-4">
           <button 
             onClick={onToggleSidebar}
@@ -48,7 +49,6 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
           >
             <HiMenuAlt3 size={24} />
           </button>
-          
           <div className="flex items-center gap-3 flex-1">
             <div className="relative">
               <img 
@@ -66,8 +66,19 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+      {/* Messages Area with custom scrollbar */}
+      <div
+        className="
+          flex-1 overflow-y-auto p-4 space-y-4 
+          scrollbar-thin scrollbar-thumb-purple-400/30 scrollbar-track-transparent 
+          md:scrollbar-thumb-purple-500/50 md:scrollbar-track-white/10
+        "
+        style={{
+          // Always show the scrollbar for desktop, auto for mobile
+          scrollbarWidth: "thin",
+          scrollbarColor: "#a78bfa #0000", // purple-400 with transparent track
+        }}
+      >
         {messages?.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
