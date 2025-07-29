@@ -1,8 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import UserSidebar from './UserSidebar'
 import MsgContainer from './MsgContainer'
 import { useDispatch, useSelector } from 'react-redux'
-import { useEffect, useState } from 'react'
 import { initializeSocket, setOnlineUsers } from '../../store/slice/socket/socketSlice'
 import { setNewMessage } from '../../store/slice/message/messageSlice'
 
@@ -23,44 +22,48 @@ const Home = () => {
       dispatch(setOnlineUsers(onlineUsers));
     });
     socket.on("newMessage", (newMessage) => {
-      console.log(newMessage);
       dispatch(setNewMessage(newMessage));
     });
     return () => {
       socket.close();
     }
-  }, [socket])
+  }, [socket, dispatch]);
 
   return (
-    <div className='h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex relative overflow-hidden'>
-      {/* Mobile Sidebar Backdrop */}
+    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+      {/* Sidebar: always visible on desktop, drawer on mobile */}
+      {/* Mobile Drawer */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <div
+            className={`
+              fixed z-50 inset-y-0 left-0 w-80 md:hidden transition-transform duration-300
+              ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}
+          >
+            <UserSidebar onClose={() => setIsSidebarOpen(false)} isMobile={true} />
+          </div>
+        </>
       )}
-      
-      {/* Sidebar */}
-      <div className={`
-        fixed md:relative z-50 h-full transition-transform duration-300
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-      `}>
-        <UserSidebar 
-          onClose={() => setIsSidebarOpen(false)}
-          isMobile={true}
-        />
+
+      {/* Desktop Sidebar */}
+      <div className="hidden md:block w-80 flex-shrink-0 h-full">
+        <UserSidebar isMobile={false} />
       </div>
-      
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
-        <MsgContainer 
+
+      {/* Main chat area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <MsgContainer
           onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
           isSidebarOpen={isSidebarOpen}
         />
       </div>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;
