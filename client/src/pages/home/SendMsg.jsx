@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { IoSend } from "react-icons/io5";
 import { sendMessageThunk } from "../../store/slice/message/messageThunk";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 const SendMsg = () => {
   const dispatch = useDispatch();
