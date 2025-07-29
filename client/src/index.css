@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom scrollbar styles for desktop (optional, aesthetic) */
+@media (hover: hover) {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #a78bfa88; /* Tailwind purple-400 with opacity */
+    border-radius: 0.5rem;
+  }
+}
