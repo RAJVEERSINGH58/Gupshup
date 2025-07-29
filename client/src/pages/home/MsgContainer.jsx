@@ -8,8 +8,9 @@ import { getMessageThunk } from "../../store/slice/message/messageThunk";
 
 const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
   const dispatch = useDispatch();
-  const { selectedUser } = useSelector((state) => state.userReducer);
-  const { messages } = useSelector(state => state.messageReducer);
+  const selectedUser = useSelector((state) => state.userReducer.selectedUser);
+  // Make sure messages always defaults to an array
+  const messages = useSelector((state) => state.messageReducer.messages) || [];
 
   // Optional: auto-scroll to latest message
   const messagesEndRef = useRef(null);
@@ -18,7 +19,7 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
     if (selectedUser?._id) {
       dispatch(getMessageThunk({ receiverId: selectedUser?._id }));
     }
-  }, [selectedUser]);
+  }, [selectedUser, dispatch]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -75,7 +76,7 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
         </div>
       </div>
 
-      {/* Message List (always scrolls, never covers header or footer) */}
+      {/* Message List (scrollable) */}
       <div
         className="
           overflow-y-auto p-4 space-y-4
@@ -88,7 +89,7 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
           scrollbarColor: "#a78bfa #0000",
         }}
       >
-        {messages?.length === 0 ? (
+        {messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
@@ -108,16 +109,12 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
         )}
       </div>
 
-      {/* Input Bar (sticky at bottom, absolutely sticky on mobile) */}
+      {/* Input Bar */}
       <div className="
           p-4 bg-white/5 backdrop-blur-lg border-t border-white/20
           sticky bottom-0 z-10
           md:relative md:bottom-auto
         "
-        style={{
-          // On mobile, use sticky+bottom-0 for full-viewport adherence.
-          // On desktop, md:relative keeps it in flow (default behavior).
-        }}
       >
         <SendMsg />
       </div>
