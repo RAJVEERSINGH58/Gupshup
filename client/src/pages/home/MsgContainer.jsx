@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import User from "./User";
 import Msg from "./Msg";
 import SendMsg from "./SendMsg";
@@ -11,11 +11,20 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
   const { selectedUser } = useSelector((state) => state.userReducer);
   const { messages } = useSelector(state => state.messageReducer);
 
+  // Optional: auto-scroll to latest message
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
     if (selectedUser?._id) {
       dispatch(getMessageThunk({ receiverId: selectedUser?._id }));
     }
   }, [selectedUser]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   if (!selectedUser) {
     return (
@@ -38,9 +47,9 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
-      
-      {/* Chat Header - Now Sticky */}
+    // Use grid to lock header, content, input separated
+    <div className="flex-1 grid grid-rows-[auto,1fr,auto] h-full min-h-0 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative">
+      {/* Sticky Header */}
       <div className="sticky top-0 z-10 p-4 bg-white/10 backdrop-blur-lg border-b border-white/20 shadow-lg">
         <div className="flex items-center gap-4">
           <button 
@@ -66,17 +75,17 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
         </div>
       </div>
 
-      {/* Messages Area with custom scrollbar */}
+      {/* Message List (always scrolls, never covers header or footer) */}
       <div
         className="
-          flex-1 overflow-y-auto p-4 space-y-4 
-          scrollbar-thin scrollbar-thumb-purple-400/30 scrollbar-track-transparent 
+          overflow-y-auto p-4 space-y-4
+          scrollbar-thin scrollbar-thumb-purple-400/30 scrollbar-track-transparent
           md:scrollbar-thumb-purple-500/50 md:scrollbar-track-white/10
+          min-h-0
         "
         style={{
-          // Always show the scrollbar for desktop, auto for mobile
           scrollbarWidth: "thin",
-          scrollbarColor: "#a78bfa #0000", // purple-400 with transparent track
+          scrollbarColor: "#a78bfa #0000",
         }}
       >
         {messages?.length === 0 ? (
@@ -89,14 +98,27 @@ const MsgContainer = ({ onToggleSidebar, isSidebarOpen }) => {
             </div>
           </div>
         ) : (
-          messages?.map(messageDetails => (
-            <Msg key={messageDetails?._id} messageDetails={messageDetails} />
-          ))
+          <>
+            {messages.map(messageDetails => (
+              <Msg key={messageDetails?._id} messageDetails={messageDetails} />
+            ))}
+            {/* for auto scroll */}
+            <div ref={messagesEndRef} />
+          </>
         )}
       </div>
 
-      {/* Send Message Area */}
-      <div className="p-4 bg-white/5 backdrop-blur-lg border-t border-white/20">
+      {/* Input Bar (sticky at bottom, absolutely sticky on mobile) */}
+      <div className="
+          p-4 bg-white/5 backdrop-blur-lg border-t border-white/20
+          sticky bottom-0 z-10
+          md:relative md:bottom-auto
+        "
+        style={{
+          // On mobile, use sticky+bottom-0 for full-viewport adherence.
+          // On desktop, md:relative keeps it in flow (default behavior).
+        }}
+      >
         <SendMsg />
       </div>
     </div>
