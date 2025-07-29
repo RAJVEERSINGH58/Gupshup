@@ -11,7 +11,9 @@ import cors from "cors";
 connectDb();
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173",
+      "https://gupshup-frontend.onrender.com"
+    ],
     credentials: true,
   })
 );
